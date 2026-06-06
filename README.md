@@ -126,6 +126,9 @@ Open `https://main.d24e12izjs1e4h.amplifyapp.com/` and review:
 - UX Strategy
 - Frontend Engineering
 - AWS Cloud Architecture
+## Team members 
+• Goodness Adepoju
+• Favour Alfred
 
 ## Repository Structure
 
@@ -136,6 +139,30 @@ Open `https://main.d24e12izjs1e4h.amplifyapp.com/` and review:
 - `src/pages/charts` — Recharts visualization components.
 - `src/services/api.ts` — Axios API client and recommendation endpoint configuration.
 - `src/hooks/useFetchRecommendations.ts` — API data loader with fallback handling.
+
+ ## SOW
+https://github.com/Goodness4life/Team-Spark/blob/main/Team%20Spark%20SOW.pdf
+Sample response 
+[
+  {
+    "location": "Lekki",
+    "score": 92,
+    "rank": 1
+  },
+  {
+    "location": "Ikeja",
+    "score": 88,
+    "rank": 2
+  }
+]
+
+Project structure
+chargewise-ai/
+├── frontend/
+├── backend/
+├── architecture/
+├── datasets/
+└── docs/
 
 ## Notes
 
