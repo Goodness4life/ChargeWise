@@ -1,4 +1,4 @@
-# ChargeWise AI
+7# ChargeWise AI
 
 ChargeWise AI is a premium EV charging infrastructure planning platform designed for governments, utilities, private investors, and smart city teams.
 
@@ -41,7 +41,7 @@ ChargeWise AI combines recommendation scoring, demand analytics, and deployment 
 The frontend is implemented with React and Vite, styled with Tailwind CSS, and visualized using Recharts.
 
 The app integrates with an AWS-backed recommendation service through API Gateway and serverless infrastructure.
-
+https://github.com/Goodness4life/Team-Spark/blob/main/DOC-20260606-WA0062..pdf
 ### Core architecture
 
 - **React + Vite** for fast interface iteration and production deployment.
