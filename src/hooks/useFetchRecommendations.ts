@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchRecommendations } from '../services/api';
 
 export interface RecommendationItem {
@@ -16,35 +16,39 @@ const fallbackRecommendations: RecommendationItem[] = [
 export const useFetchRecommendations = () => {
   const [data, setData] = useState<RecommendationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
 
-  useEffect(() => {
-    let mounted = true;
+  const load = useCallback(async () => {
+    setIsLoading(true);
 
-    const load = async () => {
-      try {
-        const payload = await fetchRecommendations();
-        if (!mounted) return;
-        if (Array.isArray(payload)) {
-          setData(payload);
-        } else {
-          setData(fallbackRecommendations);
-        }
-      } catch (exception) {
-        if (!mounted) return;
-        setError('Unable to load recommendations. Showing sample insights.');
+    try {
+      const payload = await fetchRecommendations();
+      if (!mountedRef.current) return;
+      if (Array.isArray(payload)) {
+        setData(payload);
+      } else {
         setData(fallbackRecommendations);
-      } finally {
-        if (!mounted) return;
-        setIsLoading(false);
       }
-    };
-
-    load();
-    return () => {
-      mounted = false;
-    };
+    } catch {
+      if (!mountedRef.current) return;
+      setData(fallbackRecommendations);
+    } finally {
+      if (!mountedRef.current) return;
+      setIsLoading(false);
+    }
   }, []);
 
-  return { data, isLoading, error };
+  useEffect(() => {
+    mountedRef.current = true;
+    load();
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [load]);
+
+  const refresh = async () => {
+    await load();
+  };
+
+  return { data, isLoading, refresh };
 };

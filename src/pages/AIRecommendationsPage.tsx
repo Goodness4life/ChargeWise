@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { ArrowRight, Eye, TrendingUp } from 'lucide-react';
-import { useFetchRecommendations } from '../hooks/useFetchRecommendations';
+import { useMemo, useState, useEffect } from 'react';
+import { Eye, TrendingUp } from 'lucide-react';
+import { useFetchRecommendations, RecommendationItem } from '../hooks/useFetchRecommendations';
 import Skeleton from '../components/ui/Skeleton';
 
 function getRecommendationLevel(score: number) {
@@ -9,8 +9,26 @@ function getRecommendationLevel(score: number) {
   return 'Moderate Opportunity';
 }
 
+function getActionAdvice(score: number) {
+  if (score > 90) return 'Prioritize this location for immediate deployment approval and investor briefing.';
+  if (score >= 80) return 'Advance planning with a strong funding case and local deployment assessment.';
+  return 'Monitor demand conditions and stage support while preparing future deployment options.';
+}
+
 export default function AIRecommendationsPage() {
-  const { data, isLoading, error } = useFetchRecommendations();
+  const { data, isLoading, refresh } = useFetchRecommendations();
+  const [selectedRecommendation, setSelectedRecommendation] = useState<RecommendationItem | null>(null);
+
+  useEffect(() => {
+    if (!isLoading && data.length) {
+      setSelectedRecommendation((prev) => {
+        if (prev) {
+          return data.find((item) => item.rank === prev.rank) ?? data[0];
+        }
+        return data[0];
+      });
+    }
+  }, [data, isLoading]);
 
   const insightCards = useMemo(
     () => [
@@ -42,16 +60,15 @@ export default function AIRecommendationsPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <button className="inline-flex items-center gap-2 rounded-2xl border border-slate-700/80 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 transition hover:bg-slate-800">
+            <button
+              type="button"
+              onClick={refresh}
+              className="inline-flex items-center gap-2 rounded-2xl border border-slate-700/80 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 transition duration-200 hover:bg-slate-800"
+            >
               <TrendingUp className="h-4 w-4" /> Refresh insights
             </button>
           </div>
         </div>
-        {error ? (
-          <div className="mt-6 rounded-3xl border border-amber-500/20 bg-amber-500/10 px-5 py-4 text-sm text-amber-100">
-            {error}
-          </div>
-        ) : null}
       </div>
 
       <div className="rounded-[28px] border border-slate-700/60 bg-slate-950/80 p-6 shadow-surface">
@@ -84,7 +101,11 @@ export default function AIRecommendationsPage() {
                       <td className="px-4 py-5 text-slate-300">{item.score}%</td>
                       <td className="px-4 py-5 text-slate-200">{getRecommendationLevel(item.score)}</td>
                       <td className="px-4 py-5">
-                        <button className="inline-flex items-center gap-2 rounded-2xl border border-slate-700/80 bg-slate-900/80 px-4 py-2 text-sm text-slate-100 transition hover:bg-slate-800">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedRecommendation(item)}
+                          className="inline-flex items-center gap-2 rounded-2xl border border-slate-700/80 bg-slate-900/80 px-4 py-2 text-sm text-slate-100 transition duration-200 hover:bg-slate-800"
+                        >
                           <Eye className="h-4 w-4" /> Review details
                         </button>
                       </td>
@@ -94,6 +115,34 @@ export default function AIRecommendationsPage() {
           </table>
         </div>
       </div>
+
+      {selectedRecommendation ? (
+        <div className="rounded-[28px] border border-slate-700/60 bg-slate-950/80 p-8 shadow-surface">
+          <p className="text-sm uppercase tracking-[0.24em] text-cyan">Recommendation insight</p>
+          <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-2xl">
+              <h3 className="text-2xl font-semibold text-white">{selectedRecommendation.location}</h3>
+              <p className="mt-3 text-sm text-slate-300">
+                This recommendation is based on the AI platform’s location scoring and ranking model. It provides a clear deployment signal for location planning teams.
+              </p>
+            </div>
+            <div className="space-y-4 rounded-3xl border border-slate-700/70 bg-slate-900/80 p-5">
+              <div className="flex items-center justify-between text-sm text-slate-300">
+                <span>Recommendation score</span>
+                <span className="font-semibold text-white">{selectedRecommendation.score}%</span>
+              </div>
+              <div className="flex items-center justify-between text-sm text-slate-300">
+                <span>Priority tier</span>
+                <span className="font-semibold text-white">{getRecommendationLevel(selectedRecommendation.score)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm text-slate-300">
+                <span>Suggested action</span>
+                <span className="max-w-xs text-right text-white">{getActionAdvice(selectedRecommendation.score)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid gap-6 md:grid-cols-3">
         {insightCards.map((card) => (
