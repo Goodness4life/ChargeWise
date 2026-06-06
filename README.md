@@ -113,7 +113,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173` and review:
+Open `https://main.d24e12izjs1e4h.amplifyapp.com/` and review:
 
 - the landing experience and product positioning.
 - the dashboard overview and story-driven KPIs.
